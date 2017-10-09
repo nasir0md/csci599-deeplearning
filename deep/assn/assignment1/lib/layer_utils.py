@@ -1,5 +1,5 @@
 import numpy as np
-
+import pdb
 
 class sequential(object):
 	def __init__(self, *args):
@@ -110,7 +110,9 @@ class fc(object):
 		# You will probably need to reshape (flatten) the input features.           #
 		# Store the results in the variable output provided above.                  #
 		#############################################################################
-
+		feat = np.array([f.flatten() for f in feat])
+		bias = np.tile(self.params[self.b_name], (feat.shape[0], 1))
+		output = feat.dot(self.params[self.w_name]) + bias
 		#############################################################################
 		#                             END OF YOUR CODE                              #
 		#############################################################################
