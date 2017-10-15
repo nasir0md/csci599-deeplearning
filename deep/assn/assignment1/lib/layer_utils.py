@@ -138,7 +138,11 @@ class fc(object):
 		dffeat = dprev.dot(self.params[self.w_name].T)
 		dfeat = np.array([f.reshape(feat[0,].shape, order='C') for f in dffeat])
 		self.grads[self.w_name] = (ffeat.T).dot(dprev)
-		self.grads[self.b_name] = np.ones_like(self.params[self.b_name]).dot(dprev)
+		pdb.set_trace()
+		
+		# pdb.set_trace()
+		self.grads[self.b_name] = np.ones(dprev.shape[0]).dot(dprev)
+
 		#############################################################################
 		#                             END OF YOUR CODE                              #
 		#############################################################################

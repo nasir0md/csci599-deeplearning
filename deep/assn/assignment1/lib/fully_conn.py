@@ -20,7 +20,8 @@ class TestFCReLU(object):
 	def __init__(self, dropout_p=0, dtype=np.float32, seed=None):
 		self.net = sequential(
 			########## TODO: ##########
-
+			fc(np.prod((3, 4)), 10, name="fc"),
+			relu(name="relu"),
 			########### END ###########
 		)
 
