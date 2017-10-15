@@ -1,5 +1,6 @@
 import numpy as np
 import pdb
+from copy import deepcopy
 
 class sequential(object):
 	def __init__(self, *args):
@@ -110,9 +111,10 @@ class fc(object):
 		# You will probably need to reshape (flatten) the input features.           #
 		# Store the results in the variable output provided above.                  #
 		#############################################################################
-		feat = np.array([f.flatten() for f in feat])
-		bias = np.tile(self.params[self.b_name], (feat.shape[0], 1))
-		output = feat.dot(self.params[self.w_name]) + bias
+		ffeat = np.array([f.flatten() for f in feat])
+		bias = np.tile(self.params[self.b_name], (ffeat.shape[0], 1))
+		# Y = X*W + B
+		output = ffeat.dot(self.params[self.w_name]) + bias
 		#############################################################################
 		#                             END OF YOUR CODE                              #
 		#############################################################################
@@ -131,7 +133,12 @@ class fc(object):
 		# Store the computed gradients for current layer in self.grads with         #
 		# corresponding name.                                                       # 
 		#############################################################################
-
+		# grad w.r.t. feat
+		ffeat = np.array([f.flatten() for f in feat]) # flattening
+		dffeat = dprev.dot(self.params[self.w_name].T)
+		dfeat = np.array([f.reshape(feat[0,].shape, order='C') for f in dffeat])
+		self.grads[self.w_name] = (ffeat.T).dot(dprev)
+		self.grads[self.b_name] = np.ones_like(self.params[self.b_name]).dot(dprev)
 		#############################################################################
 		#                             END OF YOUR CODE                              #
 		#############################################################################
@@ -158,7 +165,7 @@ class relu(object):
 		# TODO: Implement the forward pass of a rectified linear unit               #
 		# Store the results in the variable output provided above.                  #
 		#############################################################################
-
+		output=np.clip(feat, 0, None)
 		#############################################################################
 		#                             END OF YOUR CODE                              #
 		#############################################################################
@@ -174,7 +181,10 @@ class relu(object):
 		#############################################################################
 		# TODO: Implement the backward pass of a rectified linear unit              #
 		#############################################################################
-
+		# ffeat =  np.array([f.flatten() for f in feat]) # flattening
+		# pdb.set_trace()
+		dfeat = deepcopy(dprev)
+		dfeat[np.where(feat<0)]=0
 		#############################################################################
 		#                             END OF YOUR CODE                              #
 		#############################################################################
@@ -211,7 +221,12 @@ class dropout(object):
 		#############################################################################
 		# TODO: Implement the forward pass of Dropout                               #
 		#############################################################################
-
+		if is_Training:
+			p = self.p
+			dropped = (np.random.rand(*feat.shape) < p) / p
+			output =  feat*dropped
+		else:
+			output = feat
 		#############################################################################
 		#                             END OF YOUR CODE                              #
 		#############################################################################
@@ -228,7 +243,7 @@ class dropout(object):
 		#############################################################################
 		# TODO: Implement the backward pass of Dropout                              #
 		#############################################################################
-
+		dfeat =  dprev*self.dropped
 		#############################################################################
 		#                             END OF YOUR CODE                              #
 		#############################################################################
