@@ -1,4 +1,5 @@
 import numpy as np
+import pdb
 
 
 """ Super Class """
@@ -42,7 +43,15 @@ class SGDM(Optimizer):
 		#############################################################################
 		# TODO: Implement the SGD + Momentum                                        #
 		#############################################################################
-		pass
+		for layer in self.net.layers:
+			for n, v in layer.params.iteritems():
+				if n not in self.velocity:
+					self.velocity[n] = np.zeros_like(layer.params[n])
+				# pdb.set_trace()
+				dv =  self.momentum*self.velocity[n]  - self.lr * layer.grads[n]
+				layer.params[n] = layer.params[n] + dv
+				self.velocity[n] = dv
+
 		#############################################################################
 		#                             END OF YOUR CODE                              #
 		#############################################################################
@@ -60,7 +69,14 @@ class RMSProp(Optimizer):
 		#############################################################################
 		# TODO: Implement the RMSProp                                               #
 		#############################################################################
-		pass
+		for layer in self.net.layers:
+			for n, v in layer.params.iteritems():
+				if n not in self.cache:
+					self.cache[n] = np.zeros_like(layer.params[n])
+				# pdb.set_trace()
+				self.cache[n] =  self.decay*self.cache[n]  + (1 - self.decay) * layer.grads[n]**2
+				dv = - self.lr*layer.grads[n]/np.sqrt(self.cache[n] + self.eps)
+				layer.params[n] = layer.params[n] + dv
 		#############################################################################
 		#                             END OF YOUR CODE                              #
 		#############################################################################
@@ -80,7 +96,20 @@ class Adam(Optimizer):
 		#############################################################################
 		# TODO: Implement the Adam                                                  #
 		#############################################################################
-		pass
+		self.t = self.t + 1	
+		for layer in self.net.layers:
+			for n, v in layer.params.iteritems():
+				if n not in self.mt:
+					self.mt[n] = np.zeros_like(layer.params[n])
+				if n not in self.vt:
+					self.vt[n] = np.zeros_like(layer.params[n])
+				# pdb.set_trace()
+				self.mt[n] =  self.beta1*self.mt[n]  + (1 - self.beta1) * layer.grads[n]
+				self.vt[n] =  self.beta2*self.vt[n]  + (1 - self.beta2) * layer.grads[n]**2
+				mt_hat = self.mt[n]/(1-self.beta1**self.t)
+				vt_hat = self.vt[n]/(1-self.beta2**self.t)
+				dv = - self.lr*mt_hat/(np.sqrt(vt_hat) + self.eps)
+				layer.params[n] = layer.params[n] + dv
 		#############################################################################
 		#                             END OF YOUR CODE                              #
 		#############################################################################

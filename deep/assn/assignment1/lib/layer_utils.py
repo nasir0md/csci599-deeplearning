@@ -138,9 +138,6 @@ class fc(object):
 		dffeat = dprev.dot(self.params[self.w_name].T)
 		dfeat = np.array([f.reshape(feat[0,].shape, order='C') for f in dffeat])
 		self.grads[self.w_name] = (ffeat.T).dot(dprev)
-		pdb.set_trace()
-		
-		# pdb.set_trace()
 		self.grads[self.b_name] = np.ones(dprev.shape[0]).dot(dprev)
 
 		#############################################################################
@@ -227,8 +224,12 @@ class dropout(object):
 		#############################################################################
 		if is_Training:
 			p = self.p
-			dropped = (np.random.rand(*feat.shape) < p) / p
-			output =  feat*dropped
+			if p!=0:
+				dropped = (np.random.rand(*feat.shape) < p) / p
+				output =  feat*dropped
+			else:
+				output = feat
+				dropped = np.ones_like(feat)
 		else:
 			output = feat
 		#############################################################################
@@ -273,7 +274,9 @@ class cross_entropy(object):
 		#############################################################################
 		# TODO: Implement the forward pass of an CE Loss                            #
 		#############################################################################
-
+		num_samples = scores.shape[0]
+		logprobs = -np.log(scores[range(num_samples),label])
+		loss = np.sum(logprobs)/num_samples
 		#############################################################################
 		#                             END OF YOUR CODE                              #
 		#############################################################################
@@ -288,7 +291,11 @@ class cross_entropy(object):
 		#############################################################################
 		# TODO: Implement the backward pass of an CE Loss                           #
 		#############################################################################
-
+		num_samples = dLoss.shape[0]
+		label = self.label
+		dLoss = self.dLoss
+		dLoss[range(num_samples), label] -= 1
+		dLoss = dLoss/num_samples
 		#############################################################################
 		#                             END OF YOUR CODE                              #
 		#############################################################################
@@ -302,7 +309,8 @@ def softmax(feat):
 	#############################################################################
 	# TODO: Implement the forward pass of a softmax function                    #
 	#############################################################################
-	
+	feat_exp = np.exp(feat)
+	scores = feat_exp/np.sum(feat_exp, axis=1, keepdims=True)
 	#############################################################################
 	#                             END OF YOUR CODE                              #
 	#############################################################################

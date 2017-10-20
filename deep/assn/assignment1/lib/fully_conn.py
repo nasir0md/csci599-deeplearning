@@ -46,7 +46,10 @@ class SmallFullyConnectedNetwork(object):
 	def __init__(self, dropout_p=0, dtype=np.float32, seed=None):
 		self.net = sequential(
 			########## TODO: ##########
-
+			fc(4,30, name="fc1"),
+			relu(name="relu1"),
+			fc(30,7, name="fc2"),
+			relu(name="relu2"),
 			########### END ###########
 		)
 
@@ -101,9 +104,13 @@ class DropoutNet(object):
 class TinyNet(object):
 	def __init__(self, dropout_p=0, dtype=np.float32, seed=None):
 		""" Some comments """
+		hDim=500
 		self.net = sequential(
 			########## TODO: ##########
-			
+			fc(np.prod((3, 32, 32)), hDim, name="fc1"),
+			relu(name="relu1"),
+			fc(hDim, 10, name="fc2"),
+			# relu(name="relu2"),
 			########### END ###########
 		)
 

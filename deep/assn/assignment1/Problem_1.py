@@ -202,14 +202,14 @@ dout = np.random.randn(2, 10) # the gradients to the output, notice the shape
 
 tiny_net = TestFCReLU()
 
-tiny_net.net.assign("param_name_w", w)
-tiny_net.net.assign("param_name_b", b)
+tiny_net.net.assign("fc_w", w)
+tiny_net.net.assign("fc_b", b)
 
 out = tiny_net.forward(x)
 dx = tiny_net.backward(dout)
 
-dw = tiny_net.net.get_grads("param_name_w")
-db = tiny_net.net.get_grads("param_name_b")
+dw = tiny_net.net.get_grads("fc_w")
+db = tiny_net.net.get_grads("fc_b")
 
 dx_num = eval_numerical_gradient_array(lambda x: tiny_net.forward(x), x, dout)
 dw_num = eval_numerical_gradient_array(lambda w: tiny_net.forward(x), w, dout)

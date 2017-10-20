@@ -2,6 +2,7 @@ from lib.layer_utils import *
 from lib.grad_check import *
 from lib.optim import *
 import numpy as np
+import pdb
 
 
 class CIFAR10_DataLoader(object):
@@ -80,7 +81,7 @@ def compute_acc(model, data, labels, num_samples=None, batch_size=100):
 
 """ Some comments """
 def train_net(data, model, loss_func, optimizer, batch_size, max_epochs,
-	          lr_decay=1.0, lr_decay_every=1000, show_every=10, verbose=False):
+	          lr_decay=1.0, lr_decay_every=1000, show_every=100, verbose=True):
 	"""
 	Train a network with this function, parameters of the network are updated
 	using stochastic gradient descent methods defined in optim.py. 
@@ -155,7 +156,12 @@ def train_net(data, model, loss_func, optimizer, batch_size, max_epochs,
 			# pass to the network, and make a step for the optimizer                    #
 			#############################################################################
 			loss = None
-
+			out = model.forward(data_batch)
+			loss = loss_func.forward(out, labels_batch)
+			dprev = loss_func.backward()
+			dprev = model.backward(dprev)
+			# pdb.set_trace()
+			optimizer.step()
 			#############################################################################
 			#                             END OF YOUR CODE                              #
 			#############################################################################
@@ -172,7 +178,8 @@ def train_net(data, model, loss_func, optimizer, batch_size, max_epochs,
 		# TODO: Compute the training accuracy and validation accuracy, store the    #
 		# results to train_acc_hist, and val_acc_hist respectively                  #
 		#############################################################################
-
+		train_acc = compute_acc(model, data_train, labels_train)
+		val_acc = compute_acc(model, data_val, labels_val)
 		#############################################################################
 		#                             END OF YOUR CODE                              #
 		#############################################################################
@@ -184,7 +191,8 @@ def train_net(data, model, loss_func, optimizer, batch_size, max_epochs,
 			#############################################################################
 			# TODO: Save the optimal parameters to opt_params variable by name          #
 			#############################################################################
-			pass
+			opt_params = model.net.params
+			opt_val_acc = val_acc
 			#############################################################################
 			#                             END OF YOUR CODE                              #
 			#############################################################################
